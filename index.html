@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>便签</title>
+		<link rel="stylesheet" href="./css/main.css" />
+<!-- 		<script src="./js/sticky.js"></script> -->
+	</head>
+	
+	<body>
+		<input type="text" id="note_text" />
+		<input type="button" id="add_button" value="添加便签" />			
+		<input type="button" id="clear_button" value="清除所有" style="float:right;" />		
+		<ul id="stickies">
+			<li>
+				<span class="sticky">我的内容</span>
+			</li>
+		</ul>
+	</body>
+	<script type="text/javascript">
+		var notetext = document.getElementById("note_text");
+		var addbutton = document.getElementById("add_button");
+		var stickies = document.getElementById("stickies");
+		var noteList = [];
+		var note = {};
+		/*
+			当点击addbutton按钮时，将notetext文本框中内容，存储到本地存储中
+			localStorage中
+		*/
+		window.onload = function() {
+			if(localStorage["notes"]){
+				noteList = JSON.parse(localStorage["notes"]);
+				for(var i = 0; i < noteList.length; i++) {
+					var liNode = document.createElement("li");
+					var spanNode = document.createElement("span");
+					spanNode.className = "sticky";
+					spanNode.innerHTML = noteList[i]["note"];
+					liNode.appendChild(spanNode);
+					liNode.ondblclick = deleteNote;
+					stickies.appendChild(liNode);
+				}
+			}	
+		}
+
+		function deleteNote() {
+			noteList = JSON.parse(localStorage["notes"]);
+			//splice删除数组特定位置的元素  (删除的位置, 删除的元素的个数)
+			noteList.splice(this.title, 1);
+			localStorage["notes"] = JSON.stringify(noteList);
+			this.parentNode.removeChild(this);
+		}
+
+		addbutton.onclick = function() {
+			note = {};
+			if(localStorage["notes"]){
+				noteList = JSON.parse(localStorage["notes"]);	
+			}
+			note["note"] = notetext.value
+			noteList.push(note);
+			localStorage["notes"] = JSON.stringify(noteList);
+
+			var liNode = document.createElement("li");
+			var spanNode = document.createElement("span");
+			spanNode.className = "sticky";
+			spanNode.innerHTML = notetext.value;
+			liNode.appendChild(spanNode);
+			liNode.title = noteList.length - 1;
+					
+			liNode.ondblclick = deleteNote;
+			stickies.appendChild(liNode);
+
+		}
+	</script>
+</html>
